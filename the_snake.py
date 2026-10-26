@@ -111,11 +111,17 @@ class Snake(GameObject):
             (cur_y + dir_y * GRID_SIZE) % SCREEN_HEIGHT
         )
 
+        # Проверяем самопересечение до изменения структуры списка
+        if len(self.positions) > 2 and new_head in self.positions[2:]:
+            self.reset()
+            screen.fill(BOARD_BACKGROUND_COLOR)
+            return
+
         # Добавляем новую голову в начало списка
         self.positions.insert(0, new_head)
         self.position = new_head
 
-        # Если длина не увеличилась, удаляем последний сегмент и сохраняем его в self.last
+        # Если длина не увеличилась, удаляем последний сегмент
         if len(self.positions) > self.length:
             self.last = self.positions.pop()
         else:
@@ -129,7 +135,7 @@ class Snake(GameObject):
             pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
         # Отрисовка головы змейки
-        head_rect = pygame.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
+        head_rect = pygame.Rect(self.get_head_position(), (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(screen, self.body_color, head_rect)
         pygame.draw.rect(screen, BORDER_COLOR, head_rect, 1)
 
@@ -164,41 +170,35 @@ def main():
     snake = Snake()
     apple = Apple()
 
-    # Дополнительная проверка, чтобы яблоко на старте не лежало на змейке
+    # Перед стартом цикла генерируем позицию яблока, пока она совпадает со змейкой
     while apple.position in snake.positions:
         apple.randomize_position()
 
-    # Очищаем экран перед запуском отрисовок
+    # Первичная очистка экрана перед отрисовкой
     screen.fill(BOARD_BACKGROUND_COLOR)
 
     while True:
-        # Оригинальная строка времени для корректной работы фикстуры тестов
         clock.tick(SPEED)
 
-        # Обработка ввода и обновление курса движения
+        # Обработка ввода пользователя и обновление направления
         handle_keys(snake)
         snake.update_direction()
 
-        # Движение
+        # Движение змейки
         snake.move()
 
-        # Проверка: если голова змейки на яблоке
+        # Проверка: съела ли змейка яблоко
         if snake.get_head_position() == apple.position:
             snake.length += 1
-            # Ищем свободную ячейку для нового яблока
+            # Генерируем новое положение яблока, пока оно не окажется на пустом месте
             while apple.position in snake.positions:
                 apple.randomize_position()
 
-        # Проверка: если змейка укусила себя за хвост или туловище
-        elif snake.get_head_position() in snake.positions[1:]:
-            snake.reset()
-            screen.fill(BOARD_BACKGROUND_COLOR)
-
-        # Отрисовываем обновленные объекты
+        # Отрисовка объектов
         apple.draw()
         snake.draw()
 
-        # Выводим изменения на дисплей
+        # Обновление экрана
         pygame.display.update()
 
 
