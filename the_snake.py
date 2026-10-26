@@ -1,3 +1,4 @@
+"""Документация модуля игры Змейка."""
 import random
 import pygame
 
@@ -92,7 +93,7 @@ class Snake(GameObject):
 
     def get_head_position(self):
         """Возвращает позицию головы змейки."""
-        return self.positions
+        return self.positions[0]
 
     def update_direction(self):
         """Обновляет направление движения змейки после нажатия клавиши."""
