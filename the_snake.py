@@ -43,11 +43,12 @@ class GameObject:
     """Базовый класс для игровых объектов."""
 
     def __init__(self, body_color=None):
+        """Инициализирует базовый игровой объект."""
         self.position = (0, 0)
         self.body_color = body_color
 
     def draw_cell(self, position, color):
-        """Отрисовка одной ячейки (клетки)."""
+        """Отрисовка одной ячейки (клетки) поля."""
         rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(screen, color, rect)
         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
@@ -61,6 +62,7 @@ class Apple(GameObject):
     """Класс яблока."""
 
     def __init__(self):
+        """Инициализирует яблоко."""
         super().__init__(APPLE_COLOR)
         self.randomize_position([])
 
@@ -87,6 +89,7 @@ class Snake(GameObject):
     """Класс змейки."""
 
     def __init__(self):
+        """Инициализирует змейку."""
         super().__init__(SNAKE_COLOR)
         self.reset()
 
@@ -114,7 +117,7 @@ class Snake(GameObject):
         head = self.get_head_position()
         dx, dy = self.direction
 
-        # Вычисление новой позиции головы с учетом прохождения сквозь границы
+        # Вычисление новой позиции головы с учетом прохождения границ
         new_head = (
             (head[0] + dx * GRID_SIZE) % SCREEN_WIDTH,
             (head[1] + dy * GRID_SIZE) % SCREEN_HEIGHT,
@@ -151,8 +154,8 @@ class Snake(GameObject):
 
 
 def handle_keys(game_object):
-    """Обработка действий пользователя."""
-    # Словарь для более элегантной смены направления (из рекомендаций)
+    """Обработка действий пользователя (нажатий клавиш)."""
+    # Словарь для элегантной смены направления (из рекомендаций)
     key_direction_map = {
         (pygame.K_UP, DOWN): UP,
         (pygame.K_DOWN, UP): DOWN,
@@ -169,8 +172,7 @@ def handle_keys(game_object):
                 pygame.quit()
                 raise SystemExit
 
-            # Проверяем, есть ли нажатая клавиша в словаре
-            # и не является ли она противоположной текущему направлению
+            # Проверяем нажатую клавишу и её противоположность
             for (key, opposite_dir), new_dir in key_direction_map.items():
                 if event.key == key and game_object.direction != opposite_dir:
                     game_object.next_direction = new_dir
@@ -198,7 +200,7 @@ def main():
             snake.length += 1
             apple.randomize_position(snake.positions)
 
-        # Отрисовка
+        # Отрисовка поля
         screen.fill(BOARD_BACKGROUND_COLOR)
         apple.draw()
         snake.draw()
