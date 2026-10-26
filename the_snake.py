@@ -1,4 +1,4 @@
-from random import choice, randint
+from random import choice
 
 import pygame
 
@@ -65,7 +65,7 @@ class Apple(GameObject):
         self.randomize_position([])
 
     def randomize_position(self, snake_positions):
-        """Устанавливает случайную позицию яблока, исключая позиции змейки."""
+        """Устанавливает случайную позицию яблока вне змейки."""
         # Генерируем список всех возможных координат на поле
         all_cells = [
             (x * GRID_SIZE, y * GRID_SIZE)
@@ -74,7 +74,7 @@ class Apple(GameObject):
         ]
         # Исключаем координаты, занятые змейкой
         free_cells = list(set(all_cells) - set(snake_positions))
-        
+
         if free_cells:
             self.position = choice(free_cells)
 
@@ -113,7 +113,7 @@ class Snake(GameObject):
         """Перемещает змейку в текущем направлении."""
         head = self.get_head_position()
         dx, dy = self.direction
-        
+
         # Вычисление новой позиции головы с учетом прохождения сквозь границы
         new_head = (
             (head[0] + dx * GRID_SIZE) % SCREEN_WIDTH,
@@ -165,24 +165,26 @@ def handle_keys(game_object):
             pygame.quit()
             raise SystemExit
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:  # Завершение по ESC (из рекомендаций)
+            if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 raise SystemExit
-            
-            # Проверяем, есть ли нажатая клавиша в словаре и не является ли она противоположной текущему направлению
+
+            # Проверяем, есть ли нажатая клавиша в словаре
+            # и не является ли она противоположной текущему направлению
             for (key, opposite_dir), new_dir in key_direction_map.items():
                 if event.key == key and game_object.direction != opposite_dir:
                     game_object.next_direction = new_dir
 
 
 def main():
+    """Запускает основной цикл игры."""
     # Инициализация PyGame:
     pygame.init()
-    
+
     # Создание экземпляров классов:
     snake = Snake()
     apple = Apple()
-    apple.randomize_position(snake.positions)  # Корректный первый спавн яблока
+    apple.randomize_position(snake.positions)
 
     while True:
         clock.tick(SPEED)
