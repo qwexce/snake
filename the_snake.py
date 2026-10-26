@@ -1,4 +1,4 @@
-from random import choice, randint
+from random import randint
 import pygame
 
 # Константы для размеров поля и сетки:
@@ -115,7 +115,7 @@ class Snake(GameObject):
         self.positions.insert(0, new_head)
         self.position = new_head
 
-        # Если длина не увеличилась, удаляем последний сегмент
+        # Если длина не увеличилась, удаляем последний сегмент и сохраняем его в self.last
         if len(self.positions) > self.length:
             self.last = self.positions.pop()
         else:
@@ -164,41 +164,41 @@ def main():
     snake = Snake()
     apple = Apple()
 
-    # Перед стартом цикла генерируем позицию яблока, пока она совпадает со змейкой
+    # Дополнительная проверка, чтобы яблоко на старте не лежало на змейке
     while apple.position in snake.positions:
         apple.randomize_position()
 
-    # Первичная очистка экрана перед отрисовкой
+    # Очищаем экран перед запуском отрисовок
     screen.fill(BOARD_BACKGROUND_COLOR)
 
     while True:
-        # Оставляем строго оригинальный вызов для корректного перехвата тестами
+        # Оригинальная строка времени для корректной работы фикстуры тестов
         clock.tick(SPEED)
 
-        # Обработка ввода пользователя и обновление направления
+        # Обработка ввода и обновление курса движения
         handle_keys(snake)
         snake.update_direction()
 
-        # Движение змейки
+        # Движение
         snake.move()
 
-        # Проверка: съела ли змейка яблоко
+        # Проверка: если голова змейки на яблоке
         if snake.get_head_position() == apple.position:
             snake.length += 1
-            # Генерируем новое положение яблока, пока оно не окажется на пустом месте
+            # Ищем свободную ячейку для нового яблока
             while apple.position in snake.positions:
                 apple.randomize_position()
 
-        # Проверка: столкнулась ли змейка сама со собой
+        # Проверка: если змейка укусила себя за хвост или туловище
         elif snake.get_head_position() in snake.positions[1:]:
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
 
-        # Отрисовка объектов
+        # Отрисовываем обновленные объекты
         apple.draw()
         snake.draw()
 
-        # Обновление экрана
+        # Выводим изменения на дисплей
         pygame.display.update()
 
 
