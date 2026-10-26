@@ -92,7 +92,7 @@ class Snake(GameObject):
 
     def get_head_position(self):
         """Возвращает позицию головы змейки."""
-        return self.positions
+        return self.positions[0]
 
     def update_direction(self):
         """Обновляет направление движения змейки после нажатия клавиши."""
@@ -110,12 +110,6 @@ class Snake(GameObject):
             (cur_x + dir_x * GRID_SIZE) % SCREEN_WIDTH,
             (cur_y + dir_y * GRID_SIZE) % SCREEN_HEIGHT
         )
-
-        # Проверяем самопересечение до изменения структуры списка
-        if len(self.positions) > 2 and new_head in self.positions[2:]:
-            self.reset()
-            screen.fill(BOARD_BACKGROUND_COLOR)
-            return
 
         # Добавляем новую голову в начало списка
         self.positions.insert(0, new_head)
@@ -195,6 +189,12 @@ def main():
             # Ищем свободное место под яблоко
             while apple.position in snake.positions:
                 apple.randomize_position()
+        # Проверка на самопересечение
+        elif (
+            snake.get_head_position() in snake.positions[2:]
+        ):
+            snake.reset()
+            screen.fill(BOARD_BACKGROUND_COLOR)
 
         # Отрисовка объектов
         apple.draw()
