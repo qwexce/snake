@@ -84,6 +84,7 @@ class Snake(GameObject):
     def reset(self):
         """Сбрасывает змейку в начальное состояние."""
         self.length = 1
+        self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.positions = [self.position]
         self.direction = RIGHT
         self.next_direction = None
@@ -103,7 +104,7 @@ class Snake(GameObject):
         """Обновляет позицию змейки, добавляя новую голову и удаляя хвост."""
         cur_x, cur_y = self.get_head_position()
         dir_x, dir_y = self.direction
-        
+
         # Вычисляем новые координаты с учетом прохождения сквозь стены
         new_head = (
             (cur_x + dir_x * GRID_SIZE) % SCREEN_WIDTH,
@@ -112,8 +113,9 @@ class Snake(GameObject):
 
         # Добавляем новую голову в начало списка
         self.positions.insert(0, new_head)
+        self.position = new_head
 
-        # Если длина не увеличилась, удаляем последний сегмент и сохраняем его в self.last
+        # Если длина не увеличилась, удаляем последний сегмент
         if len(self.positions) > self.length:
             self.last = self.positions.pop()
         else:
@@ -157,7 +159,7 @@ def handle_keys(game_object):
 def main():
     """Основной игровой цикл."""
     pygame.init()
-    
+
     # Создаем экземпляры змейки и яблока
     snake = Snake()
     apple = Apple()
@@ -170,6 +172,7 @@ def main():
     screen.fill(BOARD_BACKGROUND_COLOR)
 
     while True:
+        # Оставляем строго оригинальный вызов для корректного перехвата тестами
         clock.tick(SPEED)
 
         # Обработка ввода пользователя и обновление направления
@@ -185,7 +188,7 @@ def main():
             # Генерируем новое положение яблока, пока оно не окажется на пустом месте
             while apple.position in snake.positions:
                 apple.randomize_position()
-        
+
         # Проверка: столкнулась ли змейка сама со собой
         elif snake.get_head_position() in snake.positions[1:]:
             snake.reset()
